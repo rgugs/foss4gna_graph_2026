@@ -1,0 +1,111 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# uv specific
+.uv/
+
+# pixi specific
+.pixi/*
+!.pixi/config.toml
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# Environment variables
+.env
+.env.local
+.envrc
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Ruff
+.ruff_cache/
+
+# Project-specific (add as needed)
+data/
+logs/
+*.log
+tmp/
+temp/
+
+# Celery Runtimes
+celerybeat-schedule
+celerybeat.pid
+
+# Django
+staticfiles/
+media/
+db.sqlite3
+
+# Database Backups
+*.sql
+*.dump
+
+# Geopackages
+*.gpkg-shm
+*.gpkg-wal
+
+# Other
+.ignore/

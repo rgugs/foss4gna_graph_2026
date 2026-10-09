@@ -1,0 +1,209 @@
+<html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background-color: #a4b699;
+                color: #ffffff;
+            }
+            #controls {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #29526d;
+                border-radius: 5px;
+                border: 1px solid #404040;
+            }
+            select {
+                padding: 8px;
+                margin: 5px;
+                font-size: 14px;
+                background-color: #415e72;
+                color: #ffffff;
+                border: 1px solid #555555;
+                border-radius: 4px;
+            }
+            button {
+                padding: 8px 15px;
+                margin: 5px;
+                cursor: pointer;
+                background: #f49f29;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-weight: 500;
+            }
+            button:hover {
+                background: #ce8520;
+            }
+            button:last-of-type {
+                background: #6b7280;
+            }
+            button:last-of-type:hover {
+                background: #4b5563;
+            }
+            #legend {
+                margin-bottom: 15px;
+                padding: 10px;
+                background: #29526d;
+                border: 1px solid #404040;
+                border-radius: 5px;
+            }
+            #legend span {
+                margin-right: 15px;
+            }
+            #mynetwork {
+                border: 1px solid #404040;
+                background-color: #214963;
+            }
+            label {
+                color: #e5e7eb;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="legend">
+            <strong>Legend:</strong>
+            <span>● Talk</span>
+            <span>▲ Pre-Conference Workshop</span>
+            <span>⬢ Conference Event</span>
+            <span>★ Keynote</span>
+            <span>■ Poster</span>
+            <span>◆ Lightning Talk</span>
+        </div>
+
+        <div id="controls">
+            <label
+                >Date:
+                <select id="dateFilter">
+                    <option value="all">All Dates</option>
+                    {date_options}
+                </select>
+            </label>
+
+            <label
+                >Type:
+                <select id="typeFilter">
+                    <option value="all">All Types</option>
+                    {type_options}
+                </select>
+            </label>
+
+            <label
+                >Track:
+                <select id="trackFilter">
+                    <option value="all">All Tracks</option>
+                    {track_options}
+                </select>
+            </label>
+
+            <label
+                >Topic:
+                <select id="topicFilter">
+                    <option value="all">All Topics</option>
+                    {topic_options}
+                </select>
+            </label>
+
+            <button onclick="applyFilters()">Apply Filters</button>
+            <button onclick="resetFilters()">Reset</button>
+        </div>
+
+        <div id="mynetwork"></div>
+
+        <script>
+            // Store initial data after network is stabilized
+            var storedNodes = [];
+            var storedEdges = [];
+            var isInitialized = false;
+
+            // Wait for network stabilization, then store the data
+            function initializeFilters() {
+                if (
+                    typeof nodes !== "undefined" &&
+                    typeof edges !== "undefined" &&
+                    !isInitialized
+                ) {
+                    storedNodes = nodes.get();
+                    storedEdges = edges.get();
+                    isInitialized = true;
+                } else if (!isInitialized) {
+                    setTimeout(initializeFilters, 200);
+                }
+            }
+
+            // Start trying to initialize after page load
+            setTimeout(initializeFilters, 500);
+
+            function applyFilters() {
+                if (!isInitialized) {
+                    alert("Graph is still loading, please wait...");
+                    return;
+                }
+
+                const dateFilter = document.getElementById("dateFilter").value;
+                const typeFilter = document.getElementById("typeFilter").value;
+                const trackFilter =
+                    document.getElementById("trackFilter").value;
+                const topicFilter =
+                    document.getElementById("topicFilter").value;
+
+                const filteredNodes = storedNodes.filter((node) => {
+                    // Always keep topic nodes visible (only sessions have a date)
+                    if (!node.date) return true;
+
+                    const dateMatch =
+                        dateFilter === "all" || node.date === dateFilter;
+                    const typeMatch =
+                        typeFilter === "all" || node.type === typeFilter;
+                    const trackMatch =
+                        trackFilter === "all" || node.track === trackFilter;
+
+                    let topicMatch = true;
+                    if (topicFilter !== "all") {
+                        const targetTopicNode = topicFilter;
+                        // Check if any edge connects this node to the selected topic
+                        topicMatch = storedEdges.some(
+                            (edge) =>
+                                (edge.from === node.id &&
+                                    edge.to === targetTopicNode) ||
+                                (edge.to === node.id &&
+                                    edge.from === targetTopicNode),
+                        );
+                    }
+
+                    return dateMatch && typeMatch && trackMatch && topicMatch;
+                });
+
+                const filteredNodeIds = new Set(filteredNodes.map((n) => n.id));
+                const filteredEdges = storedEdges.filter(
+                    (edge) =>
+                        filteredNodeIds.has(edge.from) &&
+                        filteredNodeIds.has(edge.to),
+                );
+
+                nodes.clear();
+                edges.clear();
+                nodes.add(filteredNodes);
+                edges.add(filteredEdges);
+            }
+
+            function resetFilters() {
+                if (!isInitialized) {
+                    alert("Graph is still loading, please wait...");
+                    return;
+                }
+
+                document.getElementById("dateFilter").value = "all";
+                document.getElementById("typeFilter").value = "all";
+                document.getElementById("trackFilter").value = "all";
+                document.getElementById("topicFilter").value = "all";
+                nodes.clear();
+                edges.clear();
+                nodes.add(storedNodes);
+                edges.add(storedEdges);
+            }
+        </script>
+    </body>
+</html>
